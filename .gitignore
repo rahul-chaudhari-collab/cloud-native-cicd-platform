@@ -1,0 +1,17 @@
+# Terraform
+terraform/.terraform/
+terraform/*.tfstate
+terraform/*.tfstate.*
+terraform/*.tfvars
+terraform/crash.log
+terraform/crash.*.log
+
+# Java / Maven
+app/target/
+
+# Secrets
+.env
+*.pem
+*.key
+credentialswq
+
