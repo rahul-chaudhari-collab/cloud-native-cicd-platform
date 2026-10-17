@@ -1,3 +1,4 @@
+
 pipeline {
     agent any
 
@@ -19,6 +20,28 @@ pipeline {
             steps {
                 dir('app') {
                     sh 'mvn clean package'
+                }
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    dir('app') {
+                        withCredentials([
+                            string(
+                                credentialsId: 'sonar-token',
+                                variable: 'SONAR_TOKEN'
+                            )
+                        ]) {
+                            sh '''
+                                mvn sonar:sonar \
+                                  -Dsonar.projectKey=cloud-native-cicd-platform \
+                                  -Dsonar.host.url=$SONAR_HOST_URL \
+                                  -Dsonar.token=$SONAR_TOKEN
+                            '''
+                        }
+                    }
                 }
             }
         }
@@ -69,10 +92,11 @@ pipeline {
 
     post {
         success {
-            echo 'Build and deployment completed successfully!'
+            echo 'Build, SonarQube analysis and deployment completed successfully!'
         }
         failure {
             echo 'Pipeline failed. Check the Jenkins console output.'
         }
     }
 }
+
